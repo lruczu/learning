@@ -8,7 +8,7 @@ from transformers import AutoModel
 from biobert.config import CHECKPOINT
 
 
-class BioBERT(torch.Module.nn):
+class BioBert(torch.nn.Module):
     """
     Based on paper:
     https://arxiv.org/abs/1909.08229
@@ -16,13 +16,13 @@ class BioBERT(torch.Module.nn):
     H = 768
 
     def __init__(self):
-        super(BioBERT, self).__init__()
+        super(BioBert, self).__init__()
         self.bert = AutoModel.from_pretrained(CHECKPOINT)
         self.start_v = torch.nn.Parameter(
-            torch.normal(mean=torch(torch.zeros(BioBERT.H)), std=torch.tensor(0.2)),
+            torch.normal(mean=torch.zeros(BioBert.H), std=torch.tensor(0.2)),
             requires_grad=True)
         self.end_v = torch.nn.Parameter(
-            torch.normal(mean=torch.zeros(BioBERT.H), std=torch.tensor(0.2)),
+            torch.normal(mean=torch.zeros(BioBert.H), std=torch.tensor(0.2)),
             requires_grad=True)
 
     def forward(
@@ -42,10 +42,9 @@ class BioBERT(torch.Module.nn):
         start_dot_product = torch.sum(last_hidden_state * self.start_v, axis=2)
         end_dot_product = torch.sum(last_hidden_state * self.end_v, axis=2)
 
+        # TODO: apply softmax only on context tokens
+        # TODO: remove softmax and compare inference times
         start_probs = F.softmax(start_dot_product) * token_type_ids
         end_probs = F.softmax(end_dot_product) * token_type_ids
 
         return start_probs, end_probs
-
-    def predict(self, context: str, question: str):
-        pass
