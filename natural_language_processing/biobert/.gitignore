@@ -1,0 +1,4 @@
+model-downloader-key.json
+models/*
+**/.venv
+**/__pycache__
